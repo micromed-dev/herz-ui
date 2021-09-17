@@ -1,6 +1,7 @@
 import initStoryshots from "@storybook/addon-storyshots"
 import { imageSnapshot } from "@storybook/addon-storyshots-puppeteer"
 import path from "path"
+import puppeteer from "puppeteer"
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -17,6 +18,18 @@ const fullPageComponents = [
 initStoryshots({
   suite: "Image storyshots",
   test: imageSnapshot({
+    getCustomBrowser: async () => {
+      const browser = await puppeteer.launch({
+        args: [
+          "--no-sandbox ",
+          "--disable-setuid-sandbox",
+          "--disable-dev-shm-usage",
+          "--font-render-hinting=none",
+          "--disable-gpu",
+        ],
+      })
+      return browser
+    },
     async beforeScreenshot(page, options) {
       // disable animations and wait 1000ms for any transitions that already started to settle
       page.evaluate(() => {
